@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Spider Weather 🕷️</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            color: white;
+
+            overflow-x: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 15% 20%,
+                    #24396d 0%,
+                    #11182d 35%,
+                    #05060b 75%
+                );
+
+            position: relative;
+        }
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            width: 600px;
+
+            height: 600px;
+
+            right: -150px;
+
+            bottom: -200px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(225, 25, 35, 0.25),
+                    transparent 70%
+                );
+
+            pointer-events: none;
+        }
+
+        body::after {
+
+            content: "";
+
+            position: fixed;
+
+            width: 500px;
+
+            height: 500px;
+
+            left: -200px;
+
+            top: -150px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(35, 95, 200, 0.22),
+                    transparent 70%
+                );
+
+            pointer-events: none;
+        }
+
+        /* ================= WEB BACKGROUND ================= */
+
+        .web {
+
+            position: fixed;
+
+            width: 650px;
+
+            height: 650px;
+
+            border-radius: 50%;
+
+            border:
+                2px solid rgba(255,255,255,0.045);
+
+            pointer-events: none;
+        }
+
+        .web::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 75px;
+
+            border-radius: 50%;
+
+            border:
+                2px solid rgba(255,255,255,0.04);
+        }
+
+        .web::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 155px;
+
+            border-radius: 50%;
+
+            border:
+                2px solid rgba(255,255,255,0.035);
+        }
+
+        .web-left {
+
+            left: -380px;
+
+            top: -380px;
+        }
+
+        .web-right {
+
+            right: -380px;
+
+            bottom: -380px;
+        }
+
+        /* ================= MAIN PAGE ================= */
+
+        .page {
+
+            width: 1150px;
+
+            max-width: 94%;
+
+            min-height: 100vh;
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns: 52% 48%;
+
+            align-items: center;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+        /* ================= LEFT CONTENT ================= */
+
+        .content {
+
+            padding: 40px 10px;
+        }
+
+        .small-title {
+
+            color: #e62429;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            letter-spacing: 5px;
+
+            margin-bottom: 18px;
+        }
+
+        h1 {
+
+            font-size: 70px;
+
+            line-height: 0.88;
+
+            letter-spacing: -5px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 28px;
+
+            color: white;
+
+            text-shadow:
+                5px 5px 0 #e62429;
+        }
+
+        h1 span {
+
+            color: #1976d2;
+
+            text-shadow:
+                5px 5px 0 #e62429;
+        }
+
+        .description {
+
+            max-width: 530px;
+
+            color: #abb5c9;
+
+            font-size: 16px;
+
+            line-height: 1.7;
+
+            margin-bottom: 30px;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .search-box {
+
+            width: 520px;
+
+            max-width: 100%;
+
+            display: flex;
+
+            gap: 10px;
+
+            padding: 7px;
+
+            border-radius: 17px;
+
+            background:
+                rgba(255,255,255,0.065);
+
+            border:
+                1px solid rgba(255,255,255,0.17);
+
+            backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        #cityInput {
+
+            flex: 1;
+
+            min-width: 0;
+
+            padding: 15px;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: 16px;
+        }
+
+        #cityInput::placeholder {
+
+            color: #7e879b;
+        }
+
+        button {
+
+            padding: 14px 27px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            color: white;
+
+            font-weight: bold;
+
+            font-size: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f21f27,
+                    #a60000
+                );
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+            box-shadow:
+                0 8px 25px
+                rgba(230,36,41,0.4);
+        }
+
+        button:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 12px 30px
+                rgba(230,36,41,0.65);
+        }
+
+        #error {
+
+            color: #ff5960;
+
+            min-height: 25px;
+
+            margin-top: 12px;
+
+            font-size: 13px;
+        }
+
+        /* ================= WEATHER CARD ================= */
+
+        .weather-card {
+
+            display: none;
+
+            width: 520px;
+
+            max-width: 100%;
+
+            padding: 27px;
+
+            margin-top: 18px;
+
+            border-radius: 24px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(215,27,40,0.90),
+                    rgba(25,35,78,0.95)
+                );
+
+            border:
+                1px solid rgba(255,255,255,0.25);
+
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.5);
+
+            animation:
+                cardAppear 0.5s ease;
+        }
+
+        @keyframes cardAppear {
+
+            from {
+
+                opacity: 0;
+
+                transform: translateY(25px);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform: translateY(0);
+            }
+        }
+
+        .weather-card::after {
+
+            content: "🕸";
+
+            position: absolute;
+
+            right: -25px;
+
+            top: -45px;
+
+            font-size: 150px;
+
+            opacity: 0.07;
+        }
+
+        #location {
+
+            font-size: 26px;
+
+            margin-bottom: 5px;
+        }
+
+        #date {
+
+            color: #e0e4eb;
+
+            font-size: 12px;
+
+            margin-bottom: 5px;
+        }
+
+        #weatherIcon {
+
+            width: 85px;
+
+            height: 85px;
+
+            object-fit: contain;
+
+            display: block;
+
+            margin: auto;
+        }
+
+        .temperature {
+
+            font-size: 68px;
+
+            font-weight: bold;
+
+            line-height: 1;
+
+            text-shadow:
+                3px 4px rgba(0,0,0,0.25);
+        }
+
+        #condition {
+
+            font-size: 18px;
+
+            margin-top: 8px;
+
+            margin-bottom: 24px;
+        }
+
+        .weather-info {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 10px;
+        }
+
+        .info-box {
+
+            padding: 14px 5px;
+
+            border-radius: 14px;
+
+            text-align: center;
+
+            background:
+                rgba(0,0,0,0.20);
+
+            border:
+                1px solid rgba(255,255,255,0.13);
+        }
+
+        .info-icon {
+
+            font-size: 22px;
+        }
+
+        .info-title {
+
+            color: #cdd3de;
+
+            font-size: 10px;
+
+            margin-top: 5px;
+
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-top: 5px;
+        }
+
+        /* ================= SPIDER-MAN SIDE ================= */
+
+        .hero {
+
+            height: 680px;
+
+            position: relative;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            overflow: hidden;
+
+            border-radius: 30px;
+        }
+
+        .hero::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 520px;
+
+            height: 520px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(230,36,41,0.35),
+                    rgba(20,40,90,0.15) 50%,
+                    transparent 72%
+                );
+
+            filter: blur(15px);
+
+            z-index: 1;
+        }
+
+        /* ================= UNSPLASH IMAGE ================= */
+
+        .spiderman {
+
+            width: 100%;
+
+            height: 100%;
+
+            position: absolute;
+
+            inset: 0;
+
+            object-fit: cover;
+
+            object-position: center;
+
+            z-index: 2;
+
+            /*
+               Dark cinematic effect
+            */
+
+            filter:
+                brightness(0.72)
+                contrast(1.15)
+                saturate(1.25);
+
+            animation:
+                spiderZoom 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes spiderZoom {
+
+            from {
+
+                transform: scale(1);
+            }
+
+            to {
+
+                transform: scale(1.06);
+            }
+        }
+
+        /* ================= IMAGE OVERLAY ================= */
+
+        .hero::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            z-index: 3;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #11182d 0%,
+                    rgba(17,24,45,0.30) 35%,
+                    rgba(5,6,11,0.05) 100%
+                );
+
+            pointer-events: none;
+        }
+
+        /* ================= WEB LINE ================= */
+
+        .web-line {
+
+            position: absolute;
+
+            width: 2px;
+
+            height: 300px;
+
+            top: -20px;
+
+            right: 20%;
+
+            background:
+                linear-gradient(
+                    white,
+                    transparent
+                );
+
+            opacity: 0.3;
+
+            transform: rotate(-18deg);
+
+            z-index: 4;
+        }
+
+        /* ================= FLOATING SPIDERS ================= */
+
+        .floating-spider {
+
+            position: absolute;
+
+            font-size: 28px;
+
+            opacity: 0.5;
+
+            z-index: 10;
+
+            animation:
+                floatSpider 5s ease-in-out infinite;
+        }
+
+        .spider-one {
+
+            top: 12%;
+
+            right: 7%;
+        }
+
+        .spider-two {
+
+            bottom: 18%;
+
+            right: 5%;
+
+            font-size: 20px;
+        }
+
+        @keyframes floatSpider {
+
+            0%,100% {
+
+                transform:
+                    translateY(0)
+                    rotate(0deg);
+            }
+
+            50% {
+
+                transform:
+                    translateY(-15px)
+                    rotate(10deg);
+            }
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+
+            position: fixed;
+
+            bottom: 12px;
+
+            left: 0;
+
+            right: 0;
+
+            text-align: center;
+
+            color: #60697b;
+
+            font-size: 11px;
+
+            z-index: 20;
+        }
+
+        .footer span {
+
+            color: #e62429;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media(max-width: 850px) {
+
+            body {
+
+                overflow-y: auto;
+            }
+
+            .page {
+
+                grid-template-columns: 1fr;
+
+                padding-top: 30px;
+            }
+
+            .content {
+
+                text-align: center;
+            }
+
+            .description {
+
+                margin-left: auto;
+
+                margin-right: auto;
+            }
+
+            .search-box {
+
+                margin-left: auto;
+
+                margin-right: auto;
+            }
+
+            .weather-card {
+
+                margin-left: auto;
+
+                margin-right: auto;
+            }
+
+            .hero {
+
+                height: 450px;
+
+                margin-top: -20px;
+            }
+
+        }
+
+        @media(max-width: 500px) {
+
+            h1 {
+
+                font-size: 46px;
+            }
+
+            .search-box {
+
+                flex-direction: column;
+            }
+
+            button {
+
+                width: 100%;
+            }
+
+            .weather-info {
+
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+
+                height: 380px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- BACKGROUND WEBS -->
+
+    <div class="web web-left"></div>
+
+    <div class="web web-right"></div>
+
+
+    <!-- FLOATING SPIDERS -->
+
+    <div class="floating-spider spider-one">
+        🕷️
+    </div>
+
+    <div class="floating-spider spider-two">
+        🕷️
+    </div>
+
+
+    <!-- MAIN PAGE -->
+
+    <main class="page">
+
+
+        <!-- LEFT SIDE -->
+
+        <section class="content">
+
+
+            <div class="small-title">
+
+                YOUR FRIENDLY NEIGHBORHOOD
+
+            </div>
+
+
+            <h1>
+
+                SPIDER
+
+                <br>
+
+                <span>
+                    WEATHER
+                </span>
+
+            </h1>
+
+
+            <p class="description">
+
+                Swing through the city and check
+                the weather before your next
+                adventure. Your neighborhood
+                weather companion is here. 🕷️
+
+            </p>
+
+
+            <!-- SEARCH -->
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="cityInput"
+                    placeholder="Enter city name..."
+                >
+
+                <button onclick="getWeather()">
+
+                    CHECK
+
+                </button>
+
+            </div>
+
+
+            <p id="error"></p>
+
+
+            <!-- WEATHER CARD -->
+
+            <div
+                class="weather-card"
+                id="weatherCard">
+
+
+                <h2 id="location">
+                    --
+                </h2>
+
+
+                <p id="date">
+                    --
+                </p>
+
+
+                <img
+                    id="weatherIcon"
+                    src=""
+                    alt="Weather"
+                >
+
+
+                <div class="temperature">
+
+                    <span id="temperature">
+                        --
+                    </span>
+
+                    °C
+
+                </div>
+
+
+                <p id="condition">
+                    --
+                </p>
+
+
+                <div class="weather-info">
+
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            💧
+                        </div>
+
+                        <div class="info-title">
+                            HUMIDITY
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="humidity">
+
+                            --%
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            💨
+                        </div>
+
+                        <div class="info-title">
+                            WIND
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="wind">
+
+                            -- km/h
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            🌡️
+                        </div>
+
+                        <div class="info-title">
+                            FEELS LIKE
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="feelsLike">
+
+                            --°C
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT SIDE -->
+
+        <section class="hero">
+
+
+            <div class="web-line"></div>
+
+
+            <!--
+                Spider-Man photo from the Unsplash
+                page provided by you.
+            -->
+
+            <img
+
+                class="spiderman"
+
+                src="https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&w=1000&q=85"
+
+                alt="Spider-Man"
+
+            >
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        Built with ❤️ 
+
+        <span>
+            • Spider Weather
+        </span>
+
+    </div>
+
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+
+        const API_KEY =
+            "ca0224a7b20c45f39cb104918261608";
+
+
+        async function getWeather() {
+
+
+            const city =
+                document
+                .getElementById("cityInput")
+                .value
+                .trim();
+
+
+            const error =
+                document
+                .getElementById("error");
+
+
+            const card =
+                document
+                .getElementById("weatherCard");
+
+
+            if (city === "") {
+
+                error.textContent =
+                    "🕷️ Enter a city first!";
+
+                card.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            try {
+
+
+                error.textContent =
+                    "🕸️ Checking the weather...";
+
+
+                const url =
+
+                    `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${encodeURIComponent(city)}&aqi=yes`;
+
+
+                const response =
+                    await fetch(url);
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+
+                        data.error?.message ||
+                        "City not found"
+
+                    );
+
+                }
+
+
+                document
+                    .getElementById("location")
+                    .textContent =
+
+                    `${data.location.name}, ${data.location.country}`;
+
+
+                document
+                    .getElementById("date")
+                    .textContent =
+
+                    data.location.localtime;
+
+
+                document
+                    .getElementById("temperature")
+                    .textContent =
+
+                    Math.round(
+                        data.current.temp_c
+                    );
+
+
+                document
+                    .getElementById("condition")
+                    .textContent =
+
+                    data.current.condition.text;
+
+
+                document
+                    .getElementById("weatherIcon")
+                    .src =
+
+                    "https:" +
+                    data.current.condition.icon;
+
+
+                document
+                    .getElementById("humidity")
+                    .textContent =
+
+                    data.current.humidity + "%";
+
+
+                document
+                    .getElementById("wind")
+                    .textContent =
+
+                    data.current.wind_kph +
+                    " km/h";
+
+
+                document
+                    .getElementById("feelsLike")
+                    .textContent =
+
+                    Math.round(
+                        data.current.feelslike_c
+                    ) + "°C";
+
+
+                card.style.display =
+                    "block";
+
+
+                error.textContent = "";
+
+            }
+
+
+            catch (err) {
+
+                error.textContent =
+                    "❌ " + err.message;
+
+                card.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        /* ENTER KEY */
+
+        document
+            .getElementById("cityInput")
+            .addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (event.key === "Enter") {
+
+                        getWeather();
+
+                    }
+
+                }
+            );
+
+    </script>
+
+
+</body>
+
+</html>
